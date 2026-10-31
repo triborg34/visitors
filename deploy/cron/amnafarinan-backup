@@ -1,0 +1,5 @@
+# پشتیبان‌گیری روزانه از پایگاه داده سامانه مدیریت بازدیدکنندگان
+# نصب: sudo cp deploy/cron/amnafarinan-backup /etc/cron.d/amnafarinan-backup
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+0 2 * * * amnafarinan cd /var/www/amnafarinan/app && DATABASE_URL=file:/var/lib/amnafarinan/amnafarinan.db BACKUP_DIR=/var/backups/amnafarinan /usr/bin/node server/dist/scripts/backup-cron.js 2>&1 | logger -t amnafarinan-backup

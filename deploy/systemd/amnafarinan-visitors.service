@@ -1,0 +1,35 @@
+[Unit]
+Description=Amnafarinan Visitor Management API
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=amnafarinan
+Group=amnafarinan
+WorkingDirectory=/var/www/amnafarinan/app
+Environment=NODE_ENV=production
+EnvironmentFile=/etc/amnafarinan/amnafarinan.env
+ExecStart=/usr/bin/node server/dist/index.js
+Restart=always
+RestartSec=5
+KillSignal=SIGTERM
+TimeoutStopSec=20
+
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/amnafarinan /var/backups/amnafarinan /var/www/amnafarinan/app
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LockPersonality=true
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=amnafarinan-visitors
+
+[Install]
+WantedBy=multi-user.target
