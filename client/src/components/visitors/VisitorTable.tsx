@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ArrowUpDown, Eye, Users } from 'lucide-react';
+import { ArrowUpDown, Eye, Trash2, Users } from 'lucide-react';
 import type { VisitListItem } from '../../types';
 import {
   FOLLOW_UP_LABELS,
@@ -23,6 +23,7 @@ interface VisitorTableProps {
   showEmployee?: boolean;
   emptyAction?: React.ReactNode;
   onOpen?: (item: VisitListItem) => void;
+  onDelete?: (item: VisitListItem) => void;
 }
 
 const COLUMNS: Array<{ key: string; label: string; sort?: SortKey; className?: string }> = [
@@ -45,6 +46,7 @@ export function VisitorTable({
   showEmployee = true,
   emptyAction,
   onOpen,
+  onDelete,
 }: VisitorTableProps) {
   if (items.length === 0) {
     return (
@@ -134,6 +136,18 @@ export function VisitorTable({
                         مشاهده
                       </Link>
                     )}
+                    {onDelete ? (
+                      <button
+                        type="button"
+                        onClick={() => onDelete(item)}
+                        aria-label={`حذف مراجعهٔ ${item.fullName}`}
+                        title="حذف مراجعه"
+                        className="inline-flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs font-medium text-rose-700 transition hover:bg-rose-50"
+                      >
+                        <Trash2 className="size-4" />
+                        حذف
+                      </button>
+                    ) : null}
                   </div>
                 </td>
               </tr>

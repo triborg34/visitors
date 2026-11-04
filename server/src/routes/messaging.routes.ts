@@ -5,8 +5,7 @@ import { validate } from '../middleware/validate';
 import { updateConnectionSchema, testConnectionSchema, MESSAGING_PLATFORMS } from '../validators/messaging.validator';
 import { ApiError, asyncHandler } from '../utils/http';
 import { clientIp, recordAudit } from '../services/audit.service';
-import { randomUUID } from 'node:crypto';
-import { isValidIranianMobile, toInternationalMobile } from '../utils/persian';
+import { sendBaleSafirMessage } from '../services/bale-safir.service';
 
 export const messagingRouter = Router();
 
@@ -137,36 +136,14 @@ messagingRouter.post(
             error = 'برای آزمایش سفیر، شمارهٔ تلفن گیرنده لازم است.';
             break;
           }
-          if (!isValidIranianMobile(testPhone)) {
-            error = 'شمارهٔ تلفن آزمایشی معتبر نیست.';
-            break;
-          }
-          {
-            const r = await fetch('https://safir.bale.ai/api/v3/send_message', {
-              method: 'POST',
-              headers: {
-                'api-access-key': connection.apiToken,
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                request_id: randomUUID(),
-                bot_id: Number(connection.botId),
-                phone_number: toInternationalMobile(testPhone),
-                message_data: { message: { text: 'پیام آزمایشی اتصال بله (سفیر).' } },
-              }),
-              signal: AbortSignal.timeout(15000),
-            });
-            const j = (await r.json().catch(() => ({}))) as {
-              message_id?: string;
-              error_data?: null | string | { message?: string; description?: string };
-            };
-            success = r.ok && !!j.message_id && (j.error_data === null || j.error_data === undefined);
-            if (!success) {
-              error = typeof j.error_data === 'string'
-                ? j.error_data
-                : j.error_data?.message ?? j.error_data?.description ?? `درخواست سفیر موفق نبود (HTTP ${r.status}).`;
-            }
-          }
+          const sent = await sendBaleSafirMessage({
+            apiAccessKey: connection.apiToken,
+            botId: connection.botId,
+            phoneNumber: testPhone,
+            text: 'پیام آزمایشی اتصال بله (سفیر).',
+          });
+          success = sent.messageId !== null;
+          error = sent.error;
           break;
         }
         case 'EITAA': {

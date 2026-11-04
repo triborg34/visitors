@@ -78,7 +78,7 @@ export function buildDeepLink(
         encodedText
       );
     case 'BALE':
-      return 'https://ble.ir/share?text=' + encodedText;
+      return null;
     case 'EITAA':
       return 'https://eitaa.com/share?text=' + encodedText;
     case 'NONE':

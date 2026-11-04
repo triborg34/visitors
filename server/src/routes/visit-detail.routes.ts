@@ -74,6 +74,26 @@ visitDetailRouter.patch(
   }),
 );
 
+visitDetailRouter.delete(
+  '/visits/:visitId',
+  asyncHandler(async (req, res) => {
+    const visitId = req.params.visitId as string;
+    await loadVisitForUser(visitId, req.user!.sub, req.user!.role);
+    await prisma.visit.update({
+      where: { id: visitId },
+      data: { deletedAt: new Date() },
+    });
+    await recordAudit({
+      userId: req.user!.sub,
+      action: 'VISIT_DELETED',
+      entity: 'Visit',
+      entityId: visitId,
+      ip: clientIp(req),
+    });
+    res.json({ success: true, data: { deleted: true } });
+  }),
+);
+
 visitDetailRouter.post(
   '/visits/:visitId/followups',
   validate(createFollowUpSchema),

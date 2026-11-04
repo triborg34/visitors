@@ -2,7 +2,7 @@ import { toInternationalMobile } from '../utils/persian';
 
 export type MessagePlatform = 'BALE' | 'EITAA' | 'WHATSAPP' | 'TELEGRAM' | 'NONE';
 
-export type LinkMethod = 'DIRECT_LINK' | 'SHARE_SHEET' | 'MANUAL_COPY';
+export type LinkMethod = 'DIRECT_LINK' | 'SHARE_SHEET' | 'MANUAL_COPY' | 'API';
 
 export type ConnectionStatus = 'UNTESTED' | 'WORKING' | 'PARTIAL' | 'NOT_WORKING';
 
@@ -26,7 +26,7 @@ export interface MessagingPlatformSpec {
  *  - WhatsApp: لینک رسمی Click to Chat (api.whatsapp.com/send) با شمارهٔ بین‌المللی.
  *  - Telegram: لینک اشتراک‌گذاری رسمی (t.me/share/url) متن را از پیش پر می‌کند ولی گفتگو را
  *    کاربر انتخاب می‌کند؛ گفتگوی مستقیم با شماره فقط با t.me/+phone و بدون متن ممکن است.
- *  - Bale: لینک اشتراک‌گذاری (ble.ir/share/url) متن را از پیش پر می‌کند؛ انتخاب مخاطب با کاربر است.
+ *  - Bale: ارسال مستقیم به شماره با API سرویس سفیر انجام می‌شود.
  *  - Eitaa: مسیر /share تنها وقتی با پارامتر url پاسخ می‌دهد؛ با text تنها به صفحهٔ اصلی هدایت
  *    می‌شود، بنابراین الگوی صحیح شامل url است و باید روی دستگاه واقعی آزمایش شود.
  */
@@ -67,15 +67,14 @@ export const MESSAGING_PLATFORM_SPECS: MessagingPlatformSpec[] = [
   {
     key: 'BALE',
     label: 'بل',
-    officialDocsUrl: 'https://ble.ir/',
-    method: 'SHARE_SHEET',
-    directChatByPhone: false,
+    officialDocsUrl: 'https://docs.bale.ai/safir',
+    method: 'API',
+    directChatByPhone: true,
     prefilledText: true,
-    linkTemplate: 'https://ble.ir/share/url?text={text}',
-    guidance:
-      'لینک اشتراک‌گذاری بل متن را از پیش پر می‌کند و پنجرهٔ انتخاب گفتگو را باز می‌کند؛ انتخاب مخاطب بر عهدهٔ کارمند است. نشانی کوتاه ble.ir/share?text= به همین آدرس هدایت می‌شود.',
-    limitations: ['مخاطب مشخصی در لینک قرار نمی‌گیرد؛ کارمند باید گفتگو را انتخاب کند.'],
-    reviewedAt: '2026-10-31',
+    linkTemplate: '',
+    guidance: 'ارسال پیام به شمارهٔ تلفن با کلید API و Bot ID سرویس سفیر انجام می‌شود.',
+    limitations: ['ارسال به شماره‌های معتبر بله وابسته به دسترسی و محدودیت‌های حساب سفیر است.'],
+    reviewedAt: '2026-11-04',
   },
   {
     key: 'EITAA',
@@ -145,6 +144,16 @@ export function buildMessagingLink(
       template: '',
       usedOverride: false,
       warnings: ['برای این مورد لینکی وجود ندارد.'],
+    };
+  }
+
+  if (spec.method === 'API') {
+    return {
+      url: null,
+      method: 'API',
+      template: '',
+      usedOverride: false,
+      warnings: ['این پلتفرم از طریق API ارسال می‌کند و لینک اشتراک‌گذاری ندارد.'],
     };
   }
 

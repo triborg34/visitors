@@ -79,7 +79,7 @@ export default function VisitorDetails() {
   const prepareMutation = useMutation({
     mutationFn: async () => {
       if (!latestVisit) throw new Error('مراجعه‌ای یافت نشد.');
-      const response = await api.post<{ log: MessageLog; deepLink: string | null }>(
+      const response = await api.post<{ log: MessageLog; deepLink: string | null; sendError: string | null }>(
         '/api/visitors/visits/' + latestVisit.id + '/messages/prepare',
         { templateKey, platform },
       );
@@ -87,6 +87,11 @@ export default function VisitorDetails() {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['visitor', id] });
+      if (platform === 'BALE') {
+        if (data.sendError) toast.error('ارسال پیام بله ناموفق بود', data.sendError);
+        else toast.success('پیام بله از طریق سفیر ارسال شد');
+        return;
+      }
       if (data.deepLink) {
         window.open(data.deepLink, '_blank', 'noopener');
         toast.info('پیام آماده و پیام‌رسان باز شد', 'پس از ارسال، گزینه «تأیید ارسال» را بزنید.');
@@ -207,13 +212,20 @@ export default function VisitorDetails() {
                 icon={<Send className="size-4" />}
                 loading={prepareMutation.isPending}
                 disabled={!latestVisit}
-                onClick={() => prepareMutation.mutate()}
+                onClick={() => {
+                  if (platform === 'BALE' && !window.confirm(`پیام از طریق سفیر به شمارهٔ ${visitor.mobile} ارسال شود؟`)) return;
+                  prepareMutation.mutate();
+                }}
               >
-                آماده‌سازی و باز کردن پیام‌رسان
+                {platform === 'BALE' ? 'ارسال مستقیم با سفیر' : 'آماده‌سازی و باز کردن پیام‌رسان'}
               </Button>
               <p className="text-xs leading-6 text-slate-500">
+                {platform === 'BALE'
+                  ? 'با تأیید شما، پیام از طریق سرویس سفیر به شمارهٔ ثبت‌شده ارسال می‌شود.'
+                  : <>
                 سامانه پیام را ارسال نمی‌کند؛ فقط متن را آماده و پیام‌رسان را باز می‌کند. ارسال را خودتان
                 تأیید کنید.
+                  </>}
               </p>
             </div>
           </div>

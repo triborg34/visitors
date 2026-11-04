@@ -53,12 +53,11 @@ const HINTS: Record<string, PlatformHints> = {
     noteText: 'از @BotFather در تلگرام با دستور /newbot دریافت می‌شود.',
   },
   BALE: {
-    tokenLabel: 'توکن ربات (Bot API)',
-    tokenPlaceholder: 'توکن دریافتی از @Bot_Father',
+    tokenLabel: 'کلید دسترسی API سفیر',
+    tokenPlaceholder: 'API Access Key از پنل کسب‌وکار بله',
     botIdLabel: 'شناسه ربات برای سفیر (Bot ID)',
     botIdPlaceholder: '123456789',
-    noteText:
-      'برای Bot API از @Bot_Father در بله توکن بگیرید. برای سرویس سفیر (ارسال به شماره) باید در business.ble.ir ثبت‌نام کنید.',
+    noteText: 'کلید API و Bot ID را از پنل کسب‌وکار بله دریافت کنید. ارسال به شماره از طریق سرویس سفیر انجام می‌شود.',
   },
   EITAA: {
     tokenLabel: 'توکن ایتایار',

@@ -20,6 +20,7 @@ import {
   renderTemplate,
 } from '../services/message.service';
 import { clientIp, recordAudit } from '../services/audit.service';
+import { sendBaleSafirMessage } from '../services/bale-safir.service';
 import { parseDateBoundary } from '../utils/dates';
 import { SORTABLE_FIELDS, buildVisitWhere } from '../services/visit-query.service';
 
@@ -241,14 +242,16 @@ visitorRouter.post(
       catalog_url: settings.catalogUrl ?? '',
     };
     const rendered = renderTemplate(body.body?.trim() || template.body, ctx);
-    const deepLink = buildDeepLink(
-      body.platform as 'BALE' | 'EITAA' | 'WHATSAPP' | 'TELEGRAM' | 'NONE',
-      visit.visitor.mobile,
-      rendered,
-      settings.catalogUrl ?? undefined,
-    );
+    const deepLink = body.platform === 'BALE'
+      ? null
+      : buildDeepLink(
+          body.platform as 'BALE' | 'EITAA' | 'WHATSAPP' | 'TELEGRAM' | 'NONE',
+          visit.visitor.mobile,
+          rendered,
+          settings.catalogUrl ?? undefined,
+        );
 
-    const log = await prisma.messageLog.create({
+    let log = await prisma.messageLog.create({
       data: {
         visitId,
         visitorId: visit.visitorId,
@@ -260,10 +263,40 @@ visitorRouter.post(
       },
     });
 
+    let sendError: string | null = null;
+    if (body.platform === 'BALE') {
+      const connection = await prisma.messagingConnection.findUnique({ where: { platform: 'BALE' } });
+      if (!connection?.apiToken || !connection.botId) {
+        sendError = 'تنظیمات کلید API و شناسهٔ بات سفیر کامل نیست.';
+      } else {
+        const result = await sendBaleSafirMessage({
+          apiAccessKey: connection.apiToken,
+          botId: connection.botId,
+          phoneNumber: visit.visitor.mobile,
+          text: rendered,
+        });
+        sendError = result.error;
+      }
+      log = await prisma.messageLog.update({
+        where: { id: log.id },
+        data: { status: sendError ? 'FAILED' : 'API_SENT' },
+      });
+      await recordAudit({
+        userId: req.user!.sub,
+        action: sendError ? 'MESSAGE_API_FAILED' : 'MESSAGE_API_SENT',
+        entity: 'MessageLog',
+        entityId: log.id,
+        details: { platform: 'BALE', error: sendError },
+        ip: clientIp(req),
+      });
+    }
+
     res.status(201).json({
       success: true,
-      data: { log, deepLink, templateKey: template.key, title: template.title },
-      message: 'پیام آماده شد. ارسال پیام بر عهده کارمند است.',
+      data: { log, deepLink, templateKey: template.key, title: template.title, sendError },
+      message: body.platform === 'BALE'
+        ? sendError ? 'ارسال پیام بله ناموفق بود.' : 'پیام از طریق سفیر ارسال شد.'
+        : 'پیام آماده شد. ارسال پیام بر عهده کارمند است.',
     });
   }),
 );
