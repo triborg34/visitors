@@ -315,17 +315,10 @@ export default function NewVisitor() {
             description="آماده‌سازی پیام با ارسال خودکار اشتباه گرفته نمی‌شود."
           />
           <div className="space-y-4">
-            <Field label="آیا پیام تشکر آماده شود؟">
-              <OptionGroup
-                name="sendThankYou"
-                columns={2}
-                value="YES"
-                onChange={(value) => setValue('sendThankYou', value === 'YES')}
-                options={[
-                  { value: 'YES', label: 'بله — پیام تشکر آماده شود' },
-                  { value: 'NO', label: 'خیر — پیامی لازم نیست' },
-                ]}
-              />
+            <Field label="آماده‌سازی پیام تشکر">
+              <p className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-800">
+                بله — پیام تشکر همیشه آماده می‌شود.
+              </p>
             </Field>
 
             <Field label="پلتفرم پیام ترجیحی" error={errors.preferredPlatform?.message}>
