@@ -53,7 +53,7 @@ const DEFAULT_VALUES: FormValues = {
   priority: 'NORMAL',
   notes: '',
   sendThankYou: true,
-  preferredPlatform: 'WHATSAPP',
+  preferredPlatform: 'BALE',
   marketingConsent: false,
   exhibitionId: '',
 };
@@ -319,7 +319,7 @@ export default function NewVisitor() {
               <OptionGroup
                 name="sendThankYou"
                 columns={2}
-                value={watch('sendThankYou') ? 'YES' : 'NO'}
+                value="YES"
                 onChange={(value) => setValue('sendThankYou', value === 'YES')}
                 options={[
                   { value: 'YES', label: 'بله — پیام تشکر آماده شود' },

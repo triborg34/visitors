@@ -62,7 +62,7 @@ export const messagePrepareSchema = z.object({
   templateKey: z
     .enum(['THANK_YOU', 'COMPANY_INTRO', 'PRODUCT_INTRO', 'CATALOG', 'FOLLOW_UP'])
     .default('THANK_YOU'),
-  platform: z.enum(PLATFORMS).default('WHATSAPP'),
+  platform: z.enum(PLATFORMS).default('BALE'),
   body: optionalPersianText(4000),
 });
 

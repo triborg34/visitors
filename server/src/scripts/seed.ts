@@ -13,7 +13,7 @@ async function main() {
       id: 'default',
       companyName: config.companyName,
       catalogUrl: config.catalogUrl,
-      defaultPlatform: 'WHATSAPP',
+      defaultPlatform: 'BALE',
     },
   });
   console.log('[seed] تنظیمات شرکت آماده شد:', settings.companyName);

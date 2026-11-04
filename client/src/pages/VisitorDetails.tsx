@@ -42,7 +42,7 @@ export default function VisitorDetails() {
   const [note, setNote] = useState('');
   const [nextFollowUpAt, setNextFollowUpAt] = useState('');
   const [templateKey, setTemplateKey] = useState('THANK_YOU');
-  const [platform, setPlatform] = useState('WHATSAPP');
+  const [platform, setPlatform] = useState('BALE');
 
   const { data: visitor, isLoading, error } = useQuery({
     queryKey: ['visitor', id],

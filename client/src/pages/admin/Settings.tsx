@@ -28,7 +28,7 @@ const EMPTY: FormState = {
   email: '',
   logoUrl: '',
   catalogUrl: '',
-  defaultPlatform: 'WHATSAPP',
+  defaultPlatform: 'BALE',
 };
 
 export default function SettingsPage() {
@@ -51,7 +51,7 @@ export default function SettingsPage() {
       email: settings.email ?? '',
       logoUrl: settings.logoUrl ?? '',
       catalogUrl: settings.catalogUrl ?? '',
-      defaultPlatform: settings.defaultPlatform ?? 'WHATSAPP',
+      defaultPlatform: settings.defaultPlatform ?? 'BALE',
     });
   }, [settings]);
 

@@ -191,7 +191,7 @@ model CompanySettings {
   email             String?
   logoUrl           String?
   catalogUrl        String?
-  defaultPlatform   String   @default("WHATSAPP")
+  defaultPlatform   String   @default("BALE")
   updatedAt         DateTime @updatedAt
   updatedById       String?
 
