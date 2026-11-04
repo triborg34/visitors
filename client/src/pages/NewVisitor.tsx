@@ -122,17 +122,30 @@ export default function NewVisitor() {
         notes: values.notes ? values.notes : undefined,
         mobile: normalizeMobileInput(values.mobile),
       };
-      const response = await api.post<{ visit: VisitListItem; duplicate: DuplicateInfo }>('/api/visitors', payload);
+      const response = await api.post<{
+        visit: VisitListItem;
+        duplicate: DuplicateInfo;
+        messageDelivery: { status: 'NOT_REQUESTED' | 'MANUAL' | 'SKIPPED' | 'SENT' | 'FAILED'; error: string | null };
+      }>('/api/visitors', payload);
       return response;
     },
     onSuccess: (response) => {
       setSaved(response.data.visit);
-      toast.success(
-        response.data.duplicate.exists ? 'مراجعه جدید ثبت شد' : 'بازدیدکننده ثبت شد',
-        response.data.duplicate.exists
-          ? 'این شماره قبلاً ثبت شده بود؛ مراجعه جدید به تاریخچه اضافه شد.'
-          : 'ثبت با موفقیت انجام شد.',
-      );
+      const delivery = response.data.messageDelivery;
+      if (delivery.status === 'SENT') {
+        toast.success('\u0628\u0627\u0632\u062f\u06cc\u062f\u06a9\u0646\u0646\u062f\u0647 \u062b\u0628\u062a \u0634\u062f', '\u067e\u06cc\u0627\u0645 \u062a\u0634\u06a9\u0631 \u0628\u0644\u0647 \u0627\u0632 \u0637\u0631\u06cc\u0642 \u0633\u0641\u06cc\u0631 \u0627\u0631\u0633\u0627\u0644 \u0634\u062f.');
+      } else if (delivery.status === 'FAILED') {
+        toast.error('\u0628\u0627\u0632\u062f\u06cc\u062f\u06a9\u0646\u0646\u062f\u0647 \u062b\u0628\u062a \u0634\u062f\u060c \u0627\u0645\u0627 \u067e\u06cc\u0627\u0645 \u0628\u0644\u0647 \u0627\u0631\u0633\u0627\u0644 \u0646\u0634\u062f', delivery.error ?? undefined);
+      } else if (delivery.status === 'SKIPPED') {
+        toast.success('\u0628\u0627\u0632\u062f\u06cc\u062f\u06a9\u0646\u0646\u062f\u0647 \u062b\u0628\u062a \u0634\u062f', delivery.error ?? undefined);
+      } else {
+        toast.success(
+          response.data.duplicate.exists ? '\u0645\u0631\u0627\u062c\u0639\u0647 \u062c\u062f\u06cc\u062f \u062b\u0628\u062a \u0634\u062f' : '\u0628\u0627\u0632\u062f\u06cc\u062f\u06a9\u0646\u0646\u062f\u0647 \u062b\u0628\u062a \u0634\u062f',
+          response.data.duplicate.exists
+            ? '\u0627\u06cc\u0646 \u0634\u0645\u0627\u0631\u0647 \u0642\u0628\u0644\u0627\u064b \u062b\u0628\u062a \u0634\u062f\u0647 \u0628\u0648\u062f\u061b \u0645\u0631\u0627\u062c\u0639\u0647 \u062c\u062f\u06cc\u062f \u0628\u0647 \u062a\u0627\u0631\u06cc\u062e\u0686\u0647 \u0627\u0636\u0627\u0641\u0647 \u0634\u062f.'
+            : '\u062b\u0628\u062a \u0628\u0627 \u0645\u0648\u0641\u0642\u06cc\u062a \u0627\u0646\u062c\u0627\u0645 \u0634\u062f.',
+        );
+      }
       reset({ ...DEFAULT_VALUES, exhibitionId });
       setDuplicate(null);
     },
@@ -341,6 +354,13 @@ export default function NewVisitor() {
                 می‌کند. ثبت شماره تماس به‌تنهایی به معنای رضایت نیست.
               </span>
             </label>
+            {watch('preferredPlatform') === 'BALE' && watch('sendThankYou') ? (
+              <p className="text-xs leading-6 text-slate-500">
+                {watch('marketingConsent')
+                  ? '\u0628\u0627 \u062a\u0623\u06cc\u06cc\u062f \u0641\u0631\u0645\u060c \u067e\u06cc\u0627\u0645 \u062a\u0634\u06a9\u0631 \u0627\u0632 \u0637\u0631\u06cc\u0642 \u0633\u0641\u06cc\u0631 \u0627\u0631\u0633\u0627\u0644 \u0645\u06cc\u200c\u0634\u0648\u062f.'
+                  : '\u0628\u0631\u0627\u06cc \u0627\u0631\u0633\u0627\u0644 \u067e\u06cc\u0627\u0645 \u0628\u0644\u0647\u060c \u062a\u0623\u06cc\u06cc\u062f \u0631\u0636\u0627\u06cc\u062a \u0628\u0627\u0632\u0627\u0631\u06cc\u0627\u0628\u06cc \u0631\u0627 \u0647\u0645 \u0641\u0639\u0627\u0644 \u06a9\u0646\u06cc\u062f.'}
+              </p>
+            ) : null}
             {errors.marketingConsent?.message ? (
               <p className="field-error">{errors.marketingConsent.message}</p>
             ) : null}

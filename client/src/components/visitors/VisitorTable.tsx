@@ -102,12 +102,12 @@ export function VisitorTable({
                       <button
                         type="button"
                         onClick={() => onDelete(item)}
-                        aria-label={`حذف مراجعهٔ ${item.fullName}`}
-                        title="حذف مراجعه"
+                        aria-label={`\u062d\u0630\u0641 \u0645\u0631\u0627\u062c\u0639\u0647\u0654 ${item.fullName}`}
+                        title={'\u062d\u0630\u0641 \u0645\u0631\u0627\u062c\u0639\u0647'}
                         className="inline-flex shrink-0 items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs font-medium text-rose-700 transition hover:bg-rose-50"
                       >
                         <Trash2 className="size-4" />
-                        حذف
+                        {'\u062d\u0630\u0641'}
                       </button>
                     ) : null}
                   </div>

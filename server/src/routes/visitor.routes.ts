@@ -169,6 +169,73 @@ visitorRouter.post(
       });
     });
 
+    let messageDelivery: {
+      status: 'NOT_REQUESTED' | 'MANUAL' | 'SKIPPED' | 'SENT' | 'FAILED';
+      error: string | null;
+    } = { status: 'NOT_REQUESTED', error: null };
+
+    if (body.sendThankYou && body.preferredPlatform === 'BALE') {
+      if (!consent) {
+        messageDelivery = {
+          status: 'SKIPPED',
+          error: 'برای ارسال پیام بله، رضایت بازاریابی لازم است.',
+        };
+      } else {
+        try {
+        const settings = await getCompanySettings();
+        const template = await getTemplateBody('THANK_YOU');
+        const messageText = renderTemplate(template.body, {
+          name: visit.visitor.fullName,
+          company: visit.visitor.company ?? settings.companyName,
+          mobile: visit.visitor.mobile,
+          exhibition: visit.exhibition.name,
+          employee: visit.employee.fullName,
+          catalog_url: settings.catalogUrl ?? '',
+        });
+        const log = await prisma.messageLog.create({
+          data: {
+            visitId: visit.id,
+            visitorId: visit.visitorId,
+            platform: 'BALE',
+            templateKey: template.key,
+            body: messageText,
+            status: 'PREPARED',
+            createdById: employeeId,
+          },
+        });
+        const connection = await prisma.messagingConnection.findUnique({ where: { platform: 'BALE' } });
+        const delivery = connection?.apiToken && connection.botId
+          ? await sendBaleSafirMessage({
+              apiAccessKey: connection.apiToken,
+              botId: connection.botId,
+              phoneNumber: visit.visitor.mobile,
+              text: messageText,
+            })
+          : { messageId: null, error: 'تنظیمات کلید API و Bot ID سفیر کامل نیست.' };
+        const status = delivery.messageId ? 'API_SENT' : 'FAILED';
+        await prisma.messageLog.update({ where: { id: log.id }, data: { status } });
+        messageDelivery = delivery.messageId
+          ? { status: 'SENT', error: null }
+          : { status: 'FAILED', error: delivery.error };
+        await recordAudit({
+          userId: employeeId,
+          action: delivery.messageId ? 'MESSAGE_API_SENT' : 'MESSAGE_API_FAILED',
+          entity: 'MessageLog',
+          entityId: log.id,
+          details: { platform: 'BALE', error: delivery.error },
+          ip: clientIp(req),
+        });
+        } catch (error) {
+          messageDelivery = {
+            status: 'FAILED',
+            error: error instanceof Error ? error.message : 'آماده‌سازی پیام بله ناموفق بود.',
+          };
+        }
+      }
+    } else if (body.sendThankYou && body.preferredPlatform && body.preferredPlatform !== 'NONE') {
+      messageDelivery = { status: 'MANUAL', error: null };
+    }
+
     await recordAudit({
       userId: employeeId,
       action: 'VISIT_CREATED',
@@ -180,7 +247,7 @@ visitorRouter.post(
 
     res.status(201).json({
       success: true,
-      data: { visit, duplicate },
+      data: { visit, duplicate, messageDelivery },
       message: duplicate.exists
         ? 'بازدیدکننده قبلاً ثبت شده بود؛ مراجعه جدید به‌عنوان مراجعه مجدد ثبت شد.'
         : 'بازدیدکننده با موفقیت ثبت شد.',

@@ -26,13 +26,12 @@ export default function MyVisitors() {
       await api.delete('/api/visitors/visits/' + visit.id);
     },
     onSuccess: () => {
-      toast.success('Ù…Ø±Ø§Ø¬Ø¹Ù‡ Ø­Ø°Ù Ø´Ø¯');
+      toast.success('\u0645\u0631\u0627\u062c\u0639\u0647 \u062d\u0630\u0641 \u0634\u062f');
       setDeleting(null);
       queryClient.invalidateQueries({ queryKey: ['visitors'] });
       queryClient.invalidateQueries({ queryKey: ['visitor'] });
     },
-    onError: (err) =>
-      toast.error('Ø­Ø°Ù Ù†Ø§Ù…ÙˆÙÙ‚ Ø¨ÙˆØ¯', err instanceof ApiRequestError ? err.message : 'Ø®Ø·Ø§ÛŒ Ù†Ø§Ù…Ø´Ø®Øµ'),
+    onError: (err) => toast.error('\u062d\u0630\u0641 \u0646\u0627\u0645\u0648\u0641\u0642 \u0628\u0648\u062f', err instanceof ApiRequestError ? err.message : '\u062e\u0637\u0627\u06cc \u0646\u0627\u0645\u0634\u062e\u0635'),
   });
 
   const { data: exhibitions } = useQuery({
