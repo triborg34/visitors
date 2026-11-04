@@ -98,7 +98,7 @@ sudo -u amnafarinan npm run db:seed             # ساخت حساب مدیر و 
 ---
 
 ## ۶. سرویس systemd
-
+ee
 ~~~bash
 sudo cp deploy/systemd/amnafarinan-visitors.service /etc/systemd/system/
 sudo systemctl daemon-reload
