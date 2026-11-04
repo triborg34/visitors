@@ -98,8 +98,8 @@ export default function MyVisitors() {
 
       <ConfirmDialog
         open={Boolean(deleting)}
-        title="Ø­Ø°Ù Ù…Ø±Ø§Ø¬Ø¹Ù‡"
-        message={<p>Ù…Ø±Ø§Ø¬Ø¹Ù‡Ù” «{deleting?.fullName}» Ø¯Ø± {deleting?.exhibition.name} Ø­Ø°Ù Ù…ÛŒâ€ŒØ´ÙˆØ¯. Ø³Ø§ÛŒØ± Ù…Ø±Ø§Ø¬Ø¹Ù‡â€ŒÙ‡Ø§ Ùˆ Ø³ÙˆØ§Ø¨Ù‚ Ø¢Ù† Ø¨Ø§Ø²Ø¯ÛŒØ¯Ú©Ù†Ù†Ø¯Ù‡ Ø¨Ø§Ù‚ÛŒ Ù…ÛŒâ€ŒÙ…Ø§Ù†Ø¯.</p>}
+        title={'\u062d\u0630\u0641 \u0645\u0631\u0627\u062c\u0639\u0647'}
+        message={<p>{'\u0645\u0631\u0627\u062c\u0639\u0647\u0654 \u00ab'}{deleting?.fullName}{'\u00bb \u062f\u0631 '}{deleting?.exhibition.name}{' \u062d\u0630\u0641 \u0645\u06cc\u200c\u0634\u0648\u062f. \u0633\u0627\u06cc\u0631 \u0645\u0631\u0627\u062c\u0639\u0647\u200c\u0647\u0627 \u0648 \u0633\u0648\u0627\u0628\u0642 \u0622\u0646 \u0628\u0627\u0632\u062f\u06cc\u062f\u06a9\u0646\u0646\u062f\u0647 \u0628\u0627\u0642\u06cc \u0645\u06cc\u200c\u0645\u0627\u0646\u062f.'}</p>}
         loading={deleteMutation.isPending}
         onClose={() => setDeleting(null)}
         onConfirm={() => deleting && deleteMutation.mutate(deleting)}
