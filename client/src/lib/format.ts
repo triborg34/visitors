@@ -92,7 +92,7 @@ export const FOLLOW_UP_LABELS: Record<FollowUpStatus, string> = {
 };
 
 export const PLATFORM_LABELS: Record<Platform, string> = {
-  BALE: 'بل',
+  BALE: 'بله',
   EITAA: 'ایتا',
   WHATSAPP: 'واتساپ',
   TELEGRAM: 'تلگرام',

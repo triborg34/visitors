@@ -220,8 +220,8 @@ export default function Connections() {
   });
 
   const testMutation = useMutation({
-    mutationFn: async (platform: string) =>
-      (await api.post<{ status: string; error: string | null }>(`/api/messaging/test`, { platform })).data,
+    mutationFn: async ({ platform, testPhone }: { platform: string; testPhone?: string }) =>
+      (await api.post<{ status: string; error: string | null }>(`/api/messaging/test`, { platform, testPhone })).data,
     onSuccess: (result) => {
       if (result.status === 'CONNECTED') {
         toast.success('اتصال با موفقیت برقرار شد');
@@ -268,8 +268,17 @@ export default function Connections() {
           <ConnectionCard
             key={conn.platform}
             conn={conn}
-            testPending={testMutation.isPending && testMutation.variables === conn.platform}
-            onTest={() => testMutation.mutate(conn.platform)}
+            testPending={testMutation.isPending && testMutation.variables?.platform === conn.platform}
+            onTest={() => {
+              if (conn.platform === 'BALE') {
+                const testPhone = window.prompt('شمارهٔ موبایل گیرندهٔ پیام آزمایشی را وارد کنید (مثلاً 989123456789). پیام واقعی ارسال می‌شود.');
+                if (!testPhone) return;
+                if (!window.confirm(`پیام آزمایشی بله به شمارهٔ ${testPhone} ارسال شود؟`)) return;
+                testMutation.mutate({ platform: conn.platform, testPhone });
+                return;
+              }
+              testMutation.mutate({ platform: conn.platform });
+            }}
             onRemove={() => removeMutation.mutate(conn.platform)}
           />
         ))}

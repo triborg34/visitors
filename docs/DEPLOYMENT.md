@@ -41,7 +41,7 @@ sudo chown -R amnafarinan:amnafarinan /var/www/amnafarinan /var/lib/amnafarinan 
 ## ۳. کپی کد و نصب وابستگی‌ها
 
 ~~~bash
-sudo -u amnafarinan git clone <repo-url> /var/www/amnafarinan/app
+sudo -u amnafarinan git clone https://github.com/triborg34/visitors.git /var/www/amnafarinan/app
 cd /var/www/amnafarinan/app
 sudo -u amnafarinan npm install
 sudo -u amnafarinan npm run db:generate
